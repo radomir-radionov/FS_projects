@@ -6,6 +6,9 @@
 
 This project is a backend API for managing projects, built with FastAPI. It supports project management with features like creating, updating, retrieving, and deleting projects. User authentication is handled via JWT-based authentication, ensuring secure access to protected endpoints.
 
+```Swagger UI```: https://fs-projects.onrender.com/docs  
+```ReDoc```: https://fs-projects.onrender.com/redoc
+
 ### Features
 
 #### Endpoints:
