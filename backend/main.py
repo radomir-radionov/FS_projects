@@ -85,8 +85,8 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 # User login route
 @app.post("/auth/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = crud.get_user_by_email(db, form_data.username)
+def login(form_data: schemas.OAuth2EmailRequestForm, db: Session = Depends(get_db)):
+    user = crud.get_user_by_email(db, form_data.email)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

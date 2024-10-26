@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, EmailStr
 from datetime import datetime
 
 class ProjectBase(BaseModel):
@@ -20,7 +20,7 @@ class Project(ProjectBase):
 
 class UserBase(BaseModel):
     username: str
-    email: str
+    email: EmailStr  
 
 class UserCreate(UserBase):
     password: str
@@ -31,3 +31,7 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+class OAuth2EmailRequestForm(BaseModel):
+    email: EmailStr 
+    password: str
