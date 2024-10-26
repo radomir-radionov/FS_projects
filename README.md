@@ -10,12 +10,12 @@ This project is a backend API for managing projects, built with FastAPI. It supp
 
 #### Endpoints:
 
-```GET /projects```: Retrieve all projects with pagination.
-```GET /projects/{id}```: Retrieve a specific project by its ID.
-```POST /projects```: Create a new project (JWT protected).
-```PUT /projects/{id}```: Update an existing project (JWT protected).
-```DELETE /projects/{id}```: Delete a project (JWT protected).
-```POST /auth/signup```: Register a new user.
+```GET /projects```: Retrieve all projects with pagination.   
+```GET /projects/{id}```: Retrieve a specific project by its ID.    
+```POST /projects```: Create a new project (JWT protected).   
+```PUT /projects/{id}```: Update an existing project (JWT protected).     
+```DELETE /projects/{id}```: Delete a project (JWT protected).    
+```POST /auth/signup```: Register a new user.   
 ```POST /auth/login```: Authenticate a user and issue JWT.
 
 #### Data Models: 
