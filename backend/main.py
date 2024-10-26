@@ -19,7 +19,7 @@ app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 # Secret settings for JWT
-SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")  # Default for development
+SECRET_KEY = os.getenv("SECRET_KEY", "default-secret-key")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 180))
 
@@ -35,24 +35,42 @@ def get_db():
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Invalid authentication credentials. Please provide a valid token.",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
-            raise credentials_exception
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token is missing the 'sub' (subject) claim.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
     except JWTError:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token is invalid or expired. Please log in again.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     user = crud.get_user_by_email(db, email=email)
     if user is None:
-        raise credentials_exception
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found. Please check if the account exists.",
+        )
     return user
 
 # User signup route
 @app.post("/auth/signup")
 def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Email {user.email} is already registered.",
+        )
     hashed_password = get_password_hash(user.password)
     db_user = models.User(username=user.username, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
@@ -64,8 +82,16 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
 @app.post("/auth/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.get_user_by_email(db, form_data.username)
-    if not user or not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No account found with this email. Please sign up or check your email.",
+        )
+    if not verify_password(form_data.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password. Please try again.",
+        )
     token = create_access_token({"sub": user.email}, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return {"access_token": token, "token_type": "bearer"}
 
@@ -80,7 +106,10 @@ def read_projects(skip: int = 0, limit: int = 10, db: Session = Depends(get_db))
 def read_project(project_id: int, db: Session = Depends(get_db)):
     project = crud.get_project(db, project_id=project_id)
     if project is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project with ID {project_id} not found.",
+        )
     return project
 
 # Create a new project (protected route)
@@ -93,7 +122,10 @@ def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db)
 def update_project(project_id: int, project: schemas.ProjectCreate, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
     db_project = crud.get_project(db, project_id=project_id)
     if db_project is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Cannot update. Project with ID {project_id} not found.",
+        )
     return crud.update_project(db=db, project=db_project, project_data=project)
 
 # Delete a project by ID (protected route)
@@ -101,6 +133,9 @@ def update_project(project_id: int, project: schemas.ProjectCreate, db: Session 
 def delete_project(project_id: int, db: Session = Depends(get_db), user: models.User = Depends(get_current_user)):
     db_project = crud.get_project(db, project_id=project_id)
     if db_project is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Cannot delete. Project with ID {project_id} not found.",
+        )
     crud.delete_project(db=db, project=db_project)
     return
