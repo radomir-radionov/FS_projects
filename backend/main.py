@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import crud, models, schemas
+from database.database import engine  # Import the engine to bind models
 from auth.auth import create_access_token, get_password_hash, verify_password
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -13,7 +14,11 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 
+# Initialize FastAPI app
 app = FastAPI()
+
+# Create all tables if they do not exist
+models.Base.metadata.create_all(bind=engine)  # <-- This line creates tables based on your models
 
 # OAuth2 password bearer token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
