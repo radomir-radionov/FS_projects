@@ -20,7 +20,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://your-frontend-url.com"],  # Replace with your frontend URL(s)
+    allow_origins=["http://localhost:5173", "https://fs-projects-alpha.vercel.app"],  # Replace with your frontend URL(s)
     allow_credentials=True,
     allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, OPTIONS)
     allow_headers=["*"],  # Allow all headers
