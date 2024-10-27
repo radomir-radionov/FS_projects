@@ -35,7 +35,7 @@ uvicorn main:app --reload
 ```
 
 I can create an auto script do it automatically but it's not a time  
-Ask me about run app on https://www.linkedin.com/in/rutrika/
+Ask me about run app on https://www.linkedin.com/in/radomir-radionov/
 
 
 ## Backend
