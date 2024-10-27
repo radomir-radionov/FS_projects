@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware  
 from sqlalchemy.orm import Session
 from database import crud, models, schemas
-from database.database import engine  # Import the engine to bind models
+from database.database import engine 
 from auth.auth import create_access_token, get_password_hash, verify_password
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -16,6 +17,14 @@ load_dotenv()
 
 # Initialize FastAPI app
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "https://your-frontend-url.com"],  # Replace with your frontend URL(s)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, PUT, DELETE, OPTIONS)
+    allow_headers=["*"],  # Allow all headers
+)
 
 # Create all tables if they do not exist
 models.Base.metadata.create_all(bind=engine)  # <-- This line creates tables based on your models
