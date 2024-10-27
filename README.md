@@ -4,12 +4,14 @@
 
 ## Run App
 
+```
 git clone git@github.com:radomir-radionov/FS_projects.git  
 cd cd FS_projects/
-
-create an .env file and add
+```
 
 ```
+/// create an .env file and add
+
 # Database URL for SQLAlchemy
 SQLALCHEMY_DATABASE_URL="sqlite:///./sql_app.db"
 
@@ -19,16 +21,18 @@ ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES=180
 ```
 
+```
 cd frontend/  
 npm install    
 cd ..  
 cd backend/
 
-make a copy of requirements.txt file and add to the backend folder
+// make a copy of requirements.txt file and add to the backend folder
 
 pip install -r requirements.txt  
 alembic upgrade head  
 uvicorn main:app --reload
+```
 
 I can create an auto script do it automatically but it's not a time  
 Ask me about run app on https://www.linkedin.com/in/rutrika/
