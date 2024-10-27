@@ -11,7 +11,7 @@ const App = () => {
     <ProjectProvider>
       <Router>
         {state.isAuthenticated && <Navbar />} 
-        <div className="">
+        <div className="min-h-screen bg-gray-100">
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -22,7 +22,7 @@ const App = () => {
               }
             />
             <Route path="/project/:id" element={<ProjectDetail />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin" element={state.isAuthenticated ? <AdminDashboard /> : <Navigate to="/login" />} />
           </Routes>
         </div>
       </Router>

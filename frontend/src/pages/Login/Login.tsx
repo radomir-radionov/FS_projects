@@ -1,10 +1,10 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext/AuthContext';
+import api from '../../services/api';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -17,18 +17,20 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/auth/login', {
-        username,
+      const response = await api.post('/auth/login', {
+        email,
         password,
       });
-      
-      const { token, user } = response.data;
-      localStorage.setItem('token', token);
+      const { access_token, user } = response.data;
+
+      localStorage.setItem('token', access_token);
+
       dispatch({ type: 'LOGIN', payload: user });
+
       navigate('/');
     } catch (err) {
       console.log('Error logging in:', err);
-      setError('Invalid username or password');
+      setError('Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -41,11 +43,11 @@ const Login = () => {
         {error && <div className="text-red-500 mb-4">{error}</div>}
         <form onSubmit={handleLogin}>
           <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Username</label>
+            <label className="block text-gray-700 mb-2">Email</label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded"
               required
             />
@@ -62,7 +64,9 @@ const Login = () => {
           </div>
           <button
             type="submit"
-            className={`w-full py-2 px-4 font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full py-2 px-4 font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 ${
+              loading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
