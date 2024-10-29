@@ -1,5 +1,7 @@
 # Home Assignment: Portfolio Showcase with FastAPI and React
 
+https://docs.google.com/document/d/1Nuz32aUlRGnw0KlnlmRj275OvAHcoJUw3rXwaDL-oLw/edit?tab=t.0#heading=h.bcpgdw8k3iac
+
 ```vercel```: https://fs-projects-alpha.vercel.app/login
 
 ## Run App
